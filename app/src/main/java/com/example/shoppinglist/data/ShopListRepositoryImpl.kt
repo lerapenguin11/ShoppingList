@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.shoppinglist.domain.entity.ShopItem
 import com.example.shoppinglist.domain.repository.ShopListRepository
+import java.util.Random
 
 object ShopListRepositoryImpl : ShopListRepository{
 
@@ -11,6 +12,13 @@ object ShopListRepositoryImpl : ShopListRepository{
     private val shopListLD = MutableLiveData<List<ShopItem>>()
 
     private var autoIncrementId = 0
+
+    init {
+        for (i in 0 until 10000){
+            val item = ShopItem("Name $i", i.toString(), kotlin.random.Random.nextBoolean())
+            addPurchase(item)
+        }
+    }
 
     override fun addPurchase(shopItem: ShopItem) {
         if (shopItem.id == ShopItem.UNDEFINED_ID){
