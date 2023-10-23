@@ -1,5 +1,6 @@
 package com.example.shoppinglist.presentation
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +17,16 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
         notifyDataSetChanged()
     }
 
+    private var count = 0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(
-            R.layout.item_shop_enable, parent, false)
+        Log.d("ShopAdapter", "${++count}")
+        val layout = when(viewType){
+            VIEW_TYPE_DISABLE -> R.layout.item_shop_disable
+            VIEW_TYPE_ENABLE -> R.layout.item_shop_enable
+            else -> throw java.lang.RuntimeException("Unknow view type: $viewType")
+        }
+        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
 
         return ShopViewHolder(view)
     }
@@ -27,18 +35,11 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
 
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
-        val status = if(shop.enable){
-            "Active"
-        } else{
-            "Not active"
-        }
-        holder.name.text = "${shop.name} $status"
+
+        holder.name.text = shop.name
         holder.count.text = shop.count
         holder.itemView.setOnLongClickListener {
             true
-        }
-        if (shop.enable){
-            holder.name.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.purple_500))
         }
     }
 
@@ -46,6 +47,21 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
     override fun onViewRecycled(holder: ShopViewHolder) {
         super.onViewRecycled(holder)
         holder.name.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val item = shopList[position]
+        return if(item.enable){
+            VIEW_TYPE_ENABLE
+        } else{
+            VIEW_TYPE_DISABLE
+        }
+    }
+
+    companion object{
+        const val VIEW_TYPE_ENABLE = 100
+        const val VIEW_TYPE_DISABLE = 101
+        const val MAX_POOL_SIZE = 15
     }
 
     class ShopViewHolder(view : View) : RecyclerView.ViewHolder(view){
