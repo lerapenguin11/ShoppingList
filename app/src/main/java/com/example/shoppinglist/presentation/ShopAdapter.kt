@@ -17,6 +17,9 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
         notifyDataSetChanged()
     }
 
+    var onShopItemLongListener : ((ShopItem) -> Unit)? = null
+    var onShopItemClick : ((ShopItem) -> Unit)? = null
+
     private var count = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
@@ -39,7 +42,13 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
         holder.name.text = shop.name
         holder.count.text = shop.count
         holder.itemView.setOnLongClickListener {
+            onShopItemLongListener?.invoke(shop)
             true
+        }
+
+        holder.itemView.setOnClickListener{
+            onShopItemClick?.invoke(shop)
+            Log.d("INFO_ITEM_SHOP:", "Name: ${shop.name}")
         }
     }
 
@@ -58,14 +67,14 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
         }
     }
 
+    class ShopViewHolder(view : View) : RecyclerView.ViewHolder(view){
+        val name : TextView = view.findViewById(R.id.tv_name)
+        val count : TextView = view.findViewById(R.id.tv_count)
+    }
+
     companion object{
         const val VIEW_TYPE_ENABLE = 100
         const val VIEW_TYPE_DISABLE = 101
         const val MAX_POOL_SIZE = 15
-    }
-
-    class ShopViewHolder(view : View) : RecyclerView.ViewHolder(view){
-        val name : TextView = view.findViewById(R.id.tv_name)
-        val count : TextView = view.findViewById(R.id.tv_count)
     }
 }

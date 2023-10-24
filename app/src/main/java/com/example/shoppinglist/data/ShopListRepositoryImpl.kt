@@ -46,7 +46,8 @@ object ShopListRepositoryImpl : ShopListRepository{
     override fun updatePurchase(shopItem: ShopItem) {
         val oldElement = getShopItem(shopItem.id)
         shopList.remove(oldElement)
-        updatePurchase(shopItem)
+        //updatePurchase(shopItem)
+        addPurchase(shopItem)
     }
 
     private fun updateList(){
