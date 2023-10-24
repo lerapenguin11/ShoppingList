@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.entity.ShopItem
@@ -13,8 +14,10 @@ import com.example.shoppinglist.domain.entity.ShopItem
 class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
     var shopList = listOf<ShopItem>()
     set(value) {
+        val callback = ShopListDiffCallback(shopList, value)
+        val diffResult = DiffUtil.calculateDiff(callback)
+        diffResult.dispatchUpdatesTo(this)
         field = value
-        notifyDataSetChanged()
     }
 
     var onShopItemLongListener : ((ShopItem) -> Unit)? = null
@@ -23,7 +26,7 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
     private var count = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
-        Log.d("ShopAdapter", "${++count}")
+
         val layout = when(viewType){
             VIEW_TYPE_DISABLE -> R.layout.item_shop_disable
             VIEW_TYPE_ENABLE -> R.layout.item_shop_enable
@@ -38,7 +41,7 @@ class ShopAdapter : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
 
     override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
         val shop = shopList[position]
-
+        Log.d("ShopAdapter", "${++count}")
         holder.name.text = shop.name
         holder.count.text = shop.count
         holder.itemView.setOnLongClickListener {
