@@ -32,12 +32,41 @@ class ShopItemActiviry : AppCompatActivity() {
         parseIntent()
         viewModel = ViewModelProvider(this).get(ShopItemViewModel::class.java)
         initViews()
+        countTextListener()
+        nameTextListener()
+        launchRightMode()
+        observeViewModel()
+        }
+
+    private fun observeViewModel() {
+        viewModel.errorInputCount.observe(this){
+            val message = if (it){
+                getString(R.string.error_input_count)
+            }else{
+                null
+            }
+            tilCount.error = message
+        }
+
+        viewModel.errorInputName.observe(this){
+            val message = if (it){
+                getString(R.string.error_input_name)
+            }else{
+                null
+            }
+            tilName.error = message
+        }
+
+        viewModel.shouldCloseScree.observe(this){
+            finish()
+    }
+}
+
+    private fun launchRightMode() {
         when (screenMode) {
             MODE_EDIT -> launchEditMode()
             MODE_ADD -> launchAddMode()
         }
-        /*nameTextListener()
-        countTextListener()*/
     }
 
     private fun countTextListener() {
@@ -45,7 +74,7 @@ class ShopItemActiviry : AppCompatActivity() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                tilCount.error = null
+                viewModel.resetErrorInputCount()
             }
 
             override fun afterTextChanged(p0: Editable?) {}
@@ -57,7 +86,7 @@ class ShopItemActiviry : AppCompatActivity() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                tilName.error = null
+                viewModel.resetErrorInputName()
             }
 
             override fun afterTextChanged(p0: Editable?) {}
@@ -66,44 +95,29 @@ class ShopItemActiviry : AppCompatActivity() {
 
     private fun launchAddMode() {
         btSave.setOnClickListener {
-            if (etCount.text.isEmpty()){
-                tilCount.error = "Error"
-            } else if(etName.text.isEmpty()){
-                tilName.error = "Error"
-            } else if(etName.text.isEmpty() && etCount.text.isEmpty()){
-                tilCount.error = "Error"
-                tilName.error = "Error"
-                if (etName.text.isNotEmpty() && etCount.text.isNotEmpty()){
-                    nameTextListener()
-                    countTextListener()
-                }
-            }
-            else{
-                viewModel.addShopItem(
-                    inputName = etName.text.toString(),
-                    inputCount = etCount.text.toString()
-                )
-                intentMainActivity()
-            }
+            viewModel.addShopItem(
+                inputName = etName.text.toString(),
+                inputCount = etCount.text.toString()
+            )
         }
     }
 
-    private fun intentMainActivity() {
+   /* private fun intentMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-    }
+    }*/
 
     private fun launchEditMode() {
         viewModel.getShopItem(shopItemId = shopID)
         viewModel.shopItem.observe(this, Observer {
             etName.setText(it.name)
             etCount.setText(it.count)
-            btSave.setOnClickListener {
-                viewModel.updateShopItem(inputName = etName.text.toString(),
-                    inputCount = etCount.text.toString())
-                intentMainActivity()
-            }
         })
+        btSave.setOnClickListener {
+            viewModel.updateShopItem(inputName = etName.text.toString(),
+                inputCount = etCount.text.toString())
+
+        }
     }
 
     private fun parseIntent(){
