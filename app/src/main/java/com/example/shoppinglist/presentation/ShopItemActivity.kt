@@ -23,7 +23,9 @@ class ShopItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item_activity)
         parseIntent()
-        launchRightMode()
+        if (savedInstanceState == null){
+            launchRightMode()
+        }
     }
 
     private fun parseIntent(){
@@ -41,7 +43,7 @@ class ShopItemActivity : AppCompatActivity() {
             if (!intent.hasExtra(EXTRA_SHOP_ITEM_ID)){
                 throw RuntimeException("Param shop id is absent")
             }
-            shopID = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, -1)
+            shopID = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
         }
 
     }
@@ -54,7 +56,7 @@ class ShopItemActivity : AppCompatActivity() {
         }
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.shop_item_container, fragment)
+            .replace(R.id.shop_item_container, fragment)
             .commit()
     }
 
